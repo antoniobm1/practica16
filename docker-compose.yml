@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+    apache:
+        build: apache
+        ports:
+          - 80:80
+        depends_on:
+            - mysql
+        restart: always
+        networks:
+          - frontend-network
+          - backend-network
+
+    mysql:
+        image: mysql
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=lamp_db
+            - MYSQL_USER=lamp_user
+            - MYSQL_PASSWORD=lamp_password
+        volumes:
+          - mysql_data:/var/lib/mysql
+          - ./db:/docker-entrypoint-initdb.d 
+        networks:
+          - backend-newtwork
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        ports:
+          - 8080:80
+        environment: 
+          - PMA_HOST=msyql
+        depends_on:
+            - mysql
+        netwokrs:
+          - frontend-network
+          - backend-network
+
+volumes: 
+    mysql_data:
+
+networks:
+     frontend-network:
+     backend-network:
